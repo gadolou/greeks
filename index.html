@@ -7,17 +7,12 @@
     <link href="https://fonts.googleapis.com/css?family=Bowlby+One" rel="stylesheet">
     <link rel="stylesheet" href="leaflet/leaflet.css" />
 
-
     <link rel="stylesheet" href="Leaflet.EasyButton/src/easy-button.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-
-
 
     <script src="leaflet/leaflet.js"></script>
 
     <link href="style.css" rel="stylesheet" type="text/css">
-
 
     <script src="Leaflet.EasyButton/src/easy-button.js"></script>
 
@@ -26,16 +21,12 @@
     <script src="MarkerCluster/leaflet.markercluster.js"></script>
 
     <link rel="stylesheet" href="noUiSlider/nouislider.min.css" />
-        <script src="data/settings.js"></script>
+    <script src="data/settings.js"></script>
     <script src="noUiSlider/nouislider.min.js"></script>
 
     <script src="wNumb/wNumb.js"></script>
 
-
     <script src="data/metanastes.js"></script>
-
-
-
 
     <style>
         body {
@@ -49,15 +40,7 @@
         #map {
             height: 95%;
         }
-    </style>
 
-
-</head>
-
-<body>
-
-
-    <style>
         .bar {
             fill: steelblue;
         }
@@ -71,12 +54,11 @@
         }
     </style>
 
+</head>
 
-    <script>
-    </script>
+<body>
 
     <div id="slider" style="top: 50px; right: 1px; margin: 10px 25px;"></div>
-
 
     <div id="label" style="position: relative; top: 70px;">
         <p id="period"></p>
@@ -88,16 +70,14 @@
 
     <div id="map" style="position: relative; top: 85px;"></div>
 
-
     <div id="plot">
         <canvas id="bar-chart" width="50" height="20"></canvas>
     </div>
 
-
     <script>
         var minyear = period.minYear;
         var maxyear = period.maxYear;
-        millsecs = 1200;
+        var millsecs = 1200;
         var pause = true;
 
         function tooglebuttonstate() {
@@ -105,78 +85,77 @@
                 pause = true;
             } else {
                 pause = false;
-            };
-        };
+            }
+        }
 
         function timeout(i, clickme) {
 
             if (clickme == true) {
                 document.getElementById("btnvideo").value = "Stop Video";
                 tooglebuttonstate();
-            };
-
+            }
 
             if (pause == true) {
                 document.getElementById("btnvideo").value = "Replay Video";
                 return;
-            };
+            }
+
             if (pause == false) {
 
-                var newyear = minyear + i
-                ///when display all years, exit
+                var newyear = minyear + i;
+                
                 if (newyear > maxyear) {
                     document.getElementById("btnvideo").value = "Play Video";
                     return;
-                };
+                }
 
                 setTimeout(function() {
                     slidervar.noUiSlider.set([minyear, minyear + i]);
                     i = i + 1;
-                    timeout(i, false); //recursive call    
+                    timeout(i, false);
                 }, millsecs);
-            };
+            }
         }
 
+        // --- Updated Basemap Layer Definitions ---
+        var cartoAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+        var osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
+        // 1. CARTO Positron (Light)
+        var grayscale = L.tileLayer('https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=cb1_460k_1_8d68630b22a09470fb4d6bfa', {
+            attribution: cartoAttr,
+            subdomains: 'abcd',
+            maxZoom: 20
+        });
 
+        // 2. CARTO Voyager (Color)
+        var mylayers = L.tileLayer('https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_460k_1_8d68630b22a09470fb4d6bfa', {
+            attribution: cartoAttr,
+            subdomains: 'abcd',
+            maxZoom: 20
+        });
 
+        // 3. CARTO Dark Matter (Dark / Replacing broken toolserver B&W)
+        var basemap_0 = L.tileLayer('https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=cb1_460k_1_8d68630b22a09470fb4d6bfa', {
+            attribution: cartoAttr,
+            subdomains: 'abcd',
+            maxZoom: 20
+        });
 
-    var mbAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>',
-            mbUrl = 'https://{s}.basemaps.cartocdn.com/{style}/{z}/{x}/{y}.png';
+        // 4. Standard OpenStreetMap (HTTPS)
+        var basemap_1 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: osmAttr,
+            maxZoom: 19
+        });
 
-        var grayscale = L.tileLayer(mbUrl, {
-                style: 'light_all',
-                attribution: mbAttr
-            }),
-            mylayers = L.tileLayer(mbUrl, {
-                style: 'rastertiles/voyager',
-                attribution: mbAttr
-            });
-
-
-
-        //base map
+        // --- Initialize Map ---
         var map = L.map('map', {
             zoomControl: true,
             maxZoom: 18,
             layers: [mylayers]
         });
 
-//'Licensed by &copy; <a href="some_link", class="your_class"> Copyright: ImmiGrec research project-Eleni Gadolou </a>'
-map.attributionControl.addAttribution('Copyright: ImmiGrec research project-Eleni Gadolou');
-
-        //layer
-
-        var basemap_0 = L.tileLayer('http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png');
-
-
-
-        var basemap_1 = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        })
-
-
-
+        map.attributionControl.addAttribution('Copyright: ImmiGrec research project-Eleni Gadolou');
 
         function protecland_marker(feature, latlng) {
             return L.circleMarker(latlng, {
@@ -186,10 +165,8 @@ map.attributionControl.addAttribution('Copyright: ImmiGrec research project-Elen
                 weight: 1,
                 opacity: 1.0,
                 fillOpacity: 0.5
-            })
+            });
         }
-
-
 
         function popplaces_marker(feature, latlng) {
             return L.circleMarker(latlng, {
@@ -199,47 +176,42 @@ map.attributionControl.addAttribution('Copyright: ImmiGrec research project-Elen
                 weight: 1,
                 opacity: 1.0,
                 fillOpacity: 0.8
-            })
+            });
         }
 
         var popplaces = new L.geoJson(greeks_pois, {
-            //onEachFeature: pop_popplaces,
             pointToLayer: popplaces_marker
         });
 
         var cluster_popplaces = new L.MarkerClusterGroup({
-            spiderfyDistanceMultiplier: 2, //see discussion https://github.com/Leaflet/Leaflet.markercluster/issues/431
+            spiderfyDistanceMultiplier: 2,
             showCoverageOnHover: true,
             maxClusterRadius: 20,
-            //disableClusteringAtZoom:18, 
             chunkedLoading: true,
             chunkInterval: 500
         });
+
         cluster_popplaces.addLayer(popplaces);
         cluster_popplaces.addTo(map);
         map.fitBounds(cluster_popplaces.getBounds());
 
-       
-
+        // --- Layer Control Setup ---
         var baseLayers = {
-            "Grayscale basemap": grayscale,
-            "Colored basemap": mylayers
+            "Color (Voyager)": mylayers,
+            "Grayscale (Positron)": grayscale,
+            "Dark Matter": basemap_0,
+            "OpenStreetMap Standard": basemap_1
         };
 
-
-        var baseMaps = {
-            'OSM Black & White': basemap_0,
-            'OSM': basemap_1
+        var overlays = {
+            "Places": cluster_popplaces
         };
-        controler = L.control.layers(baseLayers, {
-	"Places" : cluster_popplaces
 
-        }, {
+        controler = L.control.layers(baseLayers, overlays, {
             collapsed: false
         }).addTo(map);
 
         cluster_popplaces.on('mouseover', function(e) {
-            //open popup;
             var popup = L.popup()
                 .setLatLng(e.latlng)
                 .setContent(labels.popName + ": " + e.layer.feature.properties.Name + "<br>" +
@@ -250,18 +222,14 @@ map.attributionControl.addAttribution('Copyright: ImmiGrec research project-Elen
                 .openOn(map);
         });
 
-
-
-
         var slidervar = document.getElementById('slider');
         slidervar.style.height = '10px';
-        //range.style.margin = '0 auto 30px';
         slidervar.style.margin = '0 70px 30px';
+
         noUiSlider.create(slidervar, {
             connect: true,
-            behaviour: 'tap-drag', // Move handle on tap, bar is draggable
+            behaviour: 'tap-drag',
             step: 1,
-
             format: wNumb({
                 decimals: 0
             }),
@@ -271,80 +239,67 @@ map.attributionControl.addAttribution('Copyright: ImmiGrec research project-Elen
                 min: minyear,
                 max: maxyear
             },
-            pips: { // Show a scale with the slider
+            pips: {
                 mode: 'steps',
                 stepped: true,
                 density: 8
             }
         });
 
-
         slidervar.noUiSlider.on('update', function(values, handle) {
-
 
             rangeMin = slider.noUiSlider.get()[0];
             rangeMax = slider.noUiSlider.get()[1];
 
-            //first let's clear the layer:
             cluster_popplaces.clearLayers();
 
-            //and repopulate it
             popplaces = new L.geoJson(greeks_pois, {
-                //onEachFeature: pop_popplaces,
                 filter: function(feature, layer) {
                     return (feature.properties.Date_st <= rangeMax) && (feature.properties.Date_end >= rangeMin);
                 },
                 pointToLayer: popplaces_marker
-            })
-            //console.log(map.getBounds().getEast());
-            //and back again into the cluster group
+            });
+
             cluster_popplaces.addLayer(popplaces);
 
             if (rangeMin == rangeMax) {
                 document.getElementById("period").innerHTML = labels.datayear + rangeMin + ", (Points:" + cluster_popplaces.getLayers().length + ")";
-
             } else {
                 document.getElementById("period").innerHTML = labels.dataperiod + rangeMin + "-" + rangeMax + ", (" + labels.points + cluster_popplaces.getLayers().length + ")";
             }
 
-
         });
-
 
         var toggle = L.easyButton({
             states: [{
-                    stateName: 'play',
-                    icon: 'fa-play',
-                    title: 'Play movie',
-                    onClick: function(control) {
-                        timeout(0, true);
-                        control.state('pause');
-                    }
-                }, {
-                    icon: 'fa-pause',
-                    stateName: 'pause',
-                    onClick: function(control) {
-                        timeout(0, true);
-                        control.state('replay');
-                    },
-                    title: 'Stop movie'
+                stateName: 'play',
+                icon: 'fa-play',
+                title: 'Play movie',
+                onClick: function(control) {
+                    timeout(0, true);
+                    control.state('pause');
+                }
+            }, {
+                icon: 'fa-pause',
+                stateName: 'pause',
+                onClick: function(control) {
+                    timeout(0, true);
+                    control.state('replay');
                 },
-                {
-                    icon: 'fa-undo',
-                    stateName: 'replay',
-                    onClick: function(control) {
-                        timeout(0, true);
-                        control.state('pause');
-                    },
-                    title: 'Replay movie'
+                title: 'Stop movie'
+            }, {
+                icon: 'fa-undo',
+                stateName: 'replay',
+                onClick: function(control) {
+                    timeout(0, true);
+                    control.state('pause');
                 },
-
-            ]
+                title: 'Replay movie'
+            }]
         });
 
         toggle.addTo(map);
     </script>
-
 
 </body>
 
